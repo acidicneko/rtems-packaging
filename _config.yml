@@ -24,7 +24,6 @@ description: >- # this means to ignore newlines until "baseurl:"
   A blogpost for the "Adding packaging options to RTEMS deployement" project for GSoC'26.
 baseurl: "rtems-packaging" # the subpath of your site, e.g. /blog
 url: "acidicneko.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: jekyllrb
 github_username:  acidicneko
 
 # Build settings

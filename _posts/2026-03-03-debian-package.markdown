@@ -66,7 +66,7 @@ A typical flow looks like the following:
 ```bash
 cd out/deb_buildroot
 mkdir -p debian
-cp ../required/hardware/name.control debian/control
+cp ../<required>/<hardware>/<name>.control debian/control
 cp ../../pkg/debian.rules.in debian/rules
 cp ../../pkg/debian.changelog.in debian/changelog
 chmod +x debian/rules

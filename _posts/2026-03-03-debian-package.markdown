@@ -57,7 +57,7 @@ override_dh_auto_install:
 	@mkdir -p debian/$(PACKAGE)
 	# fail early if TARFILE not specified
 	@test -n "$(TARFILE)" || (echo "TARFILE not set (provide TARFILE env or X-RSB-TAR in debian/control)" >&2; false)
-	@tar xjf $(TARFILE) -C $(BUILDROOT) --strip-components=1
+	@tar xjf $(TARFILE) -C debian/$(PACKAGE) --strip-components=1
 
 ```
 This helps the `dpkg-buildpackage` setup the buildroot tree by extracting required tar into it.

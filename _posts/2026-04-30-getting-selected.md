@@ -12,4 +12,4 @@ I didn't get selected? I went through the whole proposal period wondering where 
 When I was just spiraling into self doubt, my friend asked me to search for `acidicneko`; my internet alias and lo behold it was there! 
 I am so happy to be selected. I would like to thank all the people in RTEMS involved for selecting me. I cannot wait to start working on this project.
 
-[Email from Google](/assets/images/gsoc_email.png)
+![Email from Google](https://raw.githubusercontent.com/acidicneko/rtems-packaging/refs/heads/main/assets/images/gsoc_email.png)

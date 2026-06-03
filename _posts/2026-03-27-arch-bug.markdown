@@ -1,0 +1,80 @@
+---
+layout: post
+title:  "Fixing bug in existing RPM Packaging backend"
+date:   2026-03-27 12:13:01 +0530
+categories: jekyll update
+---
+
+On a random evening, I was going through the existing `rtems-deployment` codebase. Specifically the `pkg/rpm.spec.in` and `pkg/linux.py`, to understand the current packging flow.
+As I was going through the `pkg/rpm.spec.in` file I noticed that the package's architecture type is never actually set. 
+
+`rpmbuild` expects `BuildArch` variable to be set inside the spec files to know the architecure.
+
+Not only the `BuildArch` variable was missing but also another variable, `arch` was being set to `noarch` (i.e all or architecture agnostic). 
+```
+# Package
+%define arch noarch
+```
+This could lead to some unwanted situtation where a `ARM` user accidentally installs a `x86_64` binary.
+
+This lead to a discussion on RTEMS Users forum which can be viewed [here](https://users.rtems.org/t/discussing-issue-82-add-packaging-options-to-rtems-deployment/577/13?u=acidicneko).
+
+After confirming with Chris that this wasn't something intentional, I started working on a fix.
+
+
+### Future proofing the build pipeline
+Even though the current flow worked for rpm, it wouldn't suffice for upcoming packging systems in future. `rpmbuild` automatically detects and set package architecure by defaulting to host arcxhitecure.
+But debian and freebsd packages don't do that. One need to explicitly define `Architure` in debian's control files and strict abi strtings in freebsd's manifest.
+Thus a shared infrastrucutre was much needed for future proofing the entire project as more and more packaging backends would be added to rtems-deployment.
+ 
+### The fix: Dynamic Waf Substitution
+To resolve this, I introduced a dynamic @RSB_HOST_ARCH@ template token. Instead of letting the spec files guess or hardcode values, our Waf orchestrator (linux.py) now dynamically samples the host environment using Python's unified platform module and injects the valid string right into the build task:
+
+linux.py
+```py
+# ...
+
+arch_map = {
+    'rpmspec': {
+        'x86_64': 'x86_64',
+        'aarch64': 'aarch64',
+    }
+}
+
+# ...
+
+bld(name=rpm_name,
+    features='subst',
+    ...
+    RSB_HOST_ARCH=arch_map["rpmspec"][platform.machine()],
+    ...
+    USER_RPM_CONFIG=user_rpm_config
+)
+```
+
+rpm.spec.in
+```
+# Build subst, collect here
+%define rsb_buildroot        @RSB_BUILDROOT@
+# ...
+%define rsb_host_arch        @RSB_HOST_ARCH@
+# ...
+%define rsb_work_path        @RSB_WORK_PATH@
+
+# ...
+# Package details
+Name: %{rpm_name}
+Version: %{rpm_version}
+Release: %{rpm_revision}
+Summary: %{rpm_summary}
+BuildArch: %{rsb_host_arch}
+License: GPLv2, GPLv3, BSD-2
+
+# ...
+
+```
+After these infrastrucutral changes running `./waf rpmspec` generates `rpm.spec` files with correct architecure substituted in.
+
+I also made a merge request i.e [!32](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/32) on rtems-deployment gitlab [repo](https://gitlab.rtems.org/rtems/tools/rtems-deployment). 
+
+With this foundational technical debt cleared out of the way, the runway is officially clear to start assembling the core modular Python backend for `rtems-pkg`.

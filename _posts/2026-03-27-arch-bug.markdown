@@ -6,16 +6,16 @@ categories: jekyll update
 ---
 
 On a random evening, I was going through the existing `rtems-deployment` codebase. Specifically the `pkg/rpm.spec.in` and `pkg/linux.py`, to understand the current packging flow.
-As I was going through the `pkg/rpm.spec.in` file I noticed that the package's architecture type is never actually set. 
+As I was going through the `pkg/rpm.spec.in` file, I noticed that the package's architecture type is never actually set. 
 
-`rpmbuild` expects `BuildArch` variable to be set inside the spec files to know the architecure.
+`rpmbuild` expects `BuildArch` variable to be set inside the spec files to know the architecture.
 
 Not only the `BuildArch` variable was missing but also another variable, `arch` was being set to `noarch` (i.e all or architecture agnostic). 
 ```
 # Package
 %define arch noarch
 ```
-This could lead to some unwanted situtation where a `ARM` user accidentally installs a `x86_64` binary.
+This could lead to some unwanted situtation where an `ARM` user accidentally installs a `x86_64` binary.
 
 This lead to a discussion on RTEMS Users forum which can be viewed [here](https://users.rtems.org/t/discussing-issue-82-add-packaging-options-to-rtems-deployment/577/13?u=acidicneko).
 
@@ -23,12 +23,16 @@ After confirming with Chris that this wasn't something intentional, I started wo
 
 
 ### Future proofing the build pipeline
-Even though the current flow worked for rpm, it wouldn't suffice for upcoming packging systems in future. `rpmbuild` automatically detects and set package architecure by defaulting to host arcxhitecure.
-But debian and freebsd packages don't do that. One need to explicitly define `Architure` in debian's control files and strict abi strtings in freebsd's manifest.
+Even though the current flow worked for rpm, it wouldn't suffice for upcoming packagers in future. `rpmbuild` automatically detects and set package architecture by defaulting to host architecture.
+But debian and freebsd packages don't do that. One need to explicitly define `Architecture` in debian's control files and strict abi strings in freebsd's manifest.
 Thus a shared infrastrucutre was much needed for future proofing the entire project as more and more packaging backends would be added to rtems-deployment.
  
 ### The fix: Dynamic Waf Substitution
-To resolve this, I introduced a dynamic @RSB_HOST_ARCH@ template token. Instead of letting the spec files guess or hardcode values, our Waf orchestrator (linux.py) now dynamically samples the host environment using Python's unified platform module and injects the valid string right into the build task:
+To resolve this, I introduced a dynamic `@RSB_HOST_ARCH@` template token. Instead of letting the spec files guess or hardcode values, our Waf orchestrator (linux.py) now dynamically samples the host environment using Python's unified platform module and injects the valid string right into the build task.
+
+This gives rise to a new problem. Different packagers use different identifiers for same architecture. 
+For example Debian uses `amd64` for `x86_64` while RPM uses `x86_64` itself. To mitigate this issue, I decided to go with a map which contains specific identifiers used by different packagers.
+After extracting the generic arch string via python host module, we get the packager specific identifier via the map.
 
 linux.py
 ```py
@@ -78,3 +82,5 @@ After these infrastrucutral changes running `./waf rpmspec` generates `rpm.spec`
 I also made a merge request i.e [!32](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/32) on rtems-deployment gitlab [repo](https://gitlab.rtems.org/rtems/tools/rtems-deployment). 
 
 With this foundational technical debt cleared out of the way, the runway is officially clear to start assembling the core modular Python backend for `rtems-pkg`.
+
+Also regarding the blog, I would be posting each week's progress here. 

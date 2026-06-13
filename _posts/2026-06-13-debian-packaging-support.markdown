@@ -126,10 +126,6 @@ To bring Debian packaging into the fold, I had to dig into pkg/linux.py and
 implement the mechanics necessary to generate full, valid Debian source trees
 on the fly.
 
-Here is a breakdown of how I structured this logic to seamlessly blend into our
-existing pipeline.
-
----
 
 ## Handling the Platform Architecture Mismatch
 

@@ -60,8 +60,8 @@ I found the main source of error:
 Turns out there were some warnings being treated as errors which in turn failed the whole compilation
 process.
 
-That was somewhat unexpected to me. During the proposal period I had definately built the tar archive for this board,
-and it worked at the time. What possibly could cause it to fail now?
+That was somewhat unexpected to me. During the proposal period I had definitely built the tar archive for this board,
+and it worked at the time. What could possibly cause it to fail now?
 I tried building it using `waf`; like I built it during proposal period.
 With the command `./waf --target=amd/amd-kria-k26`. 
 Again I left it to compile and returned after 30 minutes. A good reading session of "A Knight of Seven Kingdoms" helped a lot :)
@@ -78,13 +78,13 @@ Command Line: /home/me/Code/RTEMS/src/rsb/source-builder/sb-set-builder --prefix
 I checked the error log to see the command line and guess what it was the SAME!
 How could that possibly be right? The same command line yielding two very different results!
 
-My first instinct was to contact my friendly neighbourhood mentor Chris. After informing him 
+My first instinct was to contact my friendly neighbourhood (6700 miles away btw) mentor Chris. After informing him 
 about this anamoly, I created a topic on [users forum](users.rtems.org).
 
-I suspected something was changing the build environment. After Chris saying he felt the same,
+I suspected something was changing the build environment. After Chris confirmed he felt the same,
 I started to dig more into it.
 
-The first hint was `-Werror=format-security`. I ran a fuzzy search on the waf build log using
+The first hint was `-Werror=format-security`. I ran a fuzzy search on the `waf` build log using
 the best editor in the world neovim (sorry VSCode). I found no occurrence of it.
 Something was injecting this flag into build environment to use.
 
@@ -183,11 +183,11 @@ make[2]: *** [../../gcc-15.2.0/gcc/cp/Make-lang.in:145: cc1plus] Error 1
 ```
 
 Link-time-optimization (lto) defers optimization to linker.
-When GCC compiles with -flto, it defers optimization to link time. A backend tool called lto-wrapper 
-then analyzes the entire codebase at once and streams several gigabytes of intermediate data to TMPDIR while doing it.
+When GCC compiles with `-flto`, it defers optimization to link time. A backend tool called lto-wrapper 
+then analyzes the entire codebase at once and streams several gigabytes of intermediate data to `TMPDIR` while doing it.
 On Fedora (and most modern systemd-based distros), 
 
-/tmp is mounted on tmpfs which is a RAM-backed filesystem
+`/tmp` is mounted on `tmpfs` which is a RAM-backed filesystem
 with a kernel-enforced size quota, which in my case was around 6 GB.
 ```
 ❯ quota -s
@@ -200,17 +200,17 @@ That quota exists to prevent runaway processes from exhausting host memory.
 
 On some systems though(i.e Debian based) `/tmp` points to disk-storage.
 
-This issue was easily solved by temporarily changing /tmp dir by modifying
+This issue was easily solved by temporarily changing `/tmp` dir by modifying
 `TMP`, `TMPDIR` and `TEMP` variables.
 
-My initial step was to modify these vars in the spec file itself before calling `rsb`.
+My initial thought was to modify these vars in the spec file itself before calling `rsb`.
 ```
 export TMPDIR=%{rsb_work_path}/build/tmp
 export TMP=%{rsb_work_path}/build/tmp
 export TEMP=%{rsb_work_path}/build/tmp
 ```
 
-But Chris suggested this should left to the host system admin; and warning the
+But Chris suggested this should be left to the host system admin; and warning the
 users about this potential issue via documentation would suffice.
 
 Regardless of the method, pointing `/tmp` to disk-storage solved the issue.

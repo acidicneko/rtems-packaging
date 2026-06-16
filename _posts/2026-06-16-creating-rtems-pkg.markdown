@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Completing work on Debian Packaging support."
+title:  "Building rtems-pkg: A Universal Packaging Wrapper"
 date:   2026-06-16 09:30:00 +0530
 categories: jekyll update
 ---

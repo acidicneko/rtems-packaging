@@ -311,6 +311,8 @@ Running:
  
 will now generate the `mypkg` metadata via `waf` and then invoke the packager executable.
 
+
+Here's the [merge request](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/36)
 In the next blog, I would be implementing FreeBSD packaging support. 
 
 Until then Sayounara!

@@ -1,0 +1,4 @@
+locale = 'en-us'
+title = "acidicneko's blogpost for GSoC'26"
+theme = "PaperMod"
+baseURL = "https://acidicneko.github.io/rtems-packaging/"

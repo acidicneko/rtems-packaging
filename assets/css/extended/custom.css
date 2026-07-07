@@ -1,0 +1,21 @@
+
+.footer-support {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 0.8rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+}
+
+.footer-support img {
+    height: 36px;
+    width: auto;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.footer-support img:hover {
+    opacity: 0.85;
+    transform: translateY(-2px);
+}

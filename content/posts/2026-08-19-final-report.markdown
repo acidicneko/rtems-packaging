@@ -5,9 +5,14 @@ date:   2026-08-19 10:37:01 +0530
 categories: jekyll update
 ---
 
-# GSoC'26 Final Report: Adding Packaging Options to RTEMS Deployment
+## About me
+Hey everyone! I’m Ayush Yadav, aka `acidicneko`, from India.
+I’m currently a pre-final-year student at the Indian Institute of Technology Jammu,
+majoring in Materials Science and Engineering.
+As much as I enjoy spending my time working with Fourier transforms of crystal
+lattice diffraction patterns, I also love programming and building things with code.
 
-GSoC'26 is nearing its end, with around a week of the coding period left.
+## Project Summary
 Over the last two months, I worked on adding packaging support for Debian
 and FreeBSD, as proposed in my original proposal. However, the scope of
 the project grew considerably in the second half of the program. Most of
@@ -16,7 +21,22 @@ midterm evaluation. After talking with Chris, the scope was later expanded
 to replace `waf` with a custom tool, `rtems-pkg`, which now acts as the
 central API for Deployment.
 
-## Midterm Goals: Adding Debian and FreeBSD Packaging Support
+## Code written during coding period
+Relevant links for the midterm evaluation are below:
+- [Merge Request !35](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/35) — fixing build environment pollution
+- [Merge Request !36](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/36) — adding Debian support
+- [Merge Request !37](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/37) — adding FreeBSD support
+
+Relevant links for the end-term evaluation are below:
+- [Merge Request !38](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/38) — replacing `waf` with `rtems-pkg`
+
+
+Other Merge Requests:
+- [Merge Request !32](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/32) — adding HOST_ARCH to rpmbuild
+- [Merge Request !34](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/34) — handling unknown arch
+
+## Goals
+### Midterm Goals: Adding Debian and FreeBSD Packaging Support
 
 Although my proposed timeline listed FreeBSD support as an end-term
 deliverable, I was able to complete it relatively easily, well before the
@@ -34,12 +54,8 @@ A new command-line utility, `rtems-pkg`, was also added to Deployment to
 simplify the packaging process. It started out as a simple wrapper but
 eventually grew into something much bigger.
 
-Relevant links for the midterm evaluation are below:
-- [Merge Request !35](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/35) — fixing build environment pollution
-- [Merge Request !36](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/36) — adding Debian support
-- [Merge Request !37](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/37) — adding FreeBSD support
 
-## End-Term Goals: Replacing `waf` with `rtems-pkg`
+### End-Term Goals: Replacing `waf` with `rtems-pkg`
 
 This wasn't originally planned, but it happened anyway. After finishing
 all my midterm and end-term goals early, my mentor asked whether it would
@@ -60,18 +76,31 @@ build options — `rtems-pkg` takes care of generating the metadata files,
 invoking the appropriate packager binary, and producing the final package,
 all on its own.
 
-Relevant links for the end-term evaluation are below:
-- [Merge Request !38](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/38) — replacing `waf` with `rtems-pkg`
 
-## TL;DR
+## What was done?
 - Debian and FreeBSD packaging support was successfully added to
   Deployment (as stated in the proposal).
 - `waf` was completely replaced by `rtems-pkg` (extended scope).
 
-## Other useful links
-- [Merge Request !32](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/32) — adding HOST_ARCH to rpmbuild
-- [Merge Request !34](https://gitlab.rtems.org/rtems/tools/rtems-deployment/-/merge_requests/34) — handling unknown arch
+## What wasn't? Future Scope?
+Though I achieved all the proposed goals, there are still a few gaps in
+the current `rtems-pkg` implementation.
+One being the user configuration stuff. With the `waf` approach it was
+possible to give custom config and change a few fields. Though totally
+possible even with the new `rtems-pkg`, it hasn't been done due to time
+constraints.
+It would be nice to support user supplied configuration.
 
+Other than that, it would be nice to have more packagers in `rtems-pkg`.
+A tutorial on adding new packagers was added to the deployment repository.
+Currently supported packagers are:
+- FreeBSD
+- Debian
+- RPM
+
+Extending the list would be pretty awesome!
+
+## Other useful links
 Discourse threads:
 - [Discussing issue #82](https://users.rtems.org/t/discussing-issue-82-add-packaging-options-to-rtems-deployment/577)
 - [RSB fails on FreeBSD 15.1](https://users.rtems.org/t/rsb-fails-on-freebsd-15-1/864)
